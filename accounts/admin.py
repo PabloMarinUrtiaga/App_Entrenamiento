@@ -5,9 +5,10 @@ from .models import User
 
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ("username", "email", "role", "is_approved", "is_staff")
+    list_display = ("username", "email", "role", "birth_date", "is_approved", "is_staff")
     list_filter = ("role", "is_approved")
     fieldsets = UserAdmin.fieldsets + (
+        ("Datos personales", {"fields": ("birth_date",)}),
         ("Rol y aprobación", {"fields": ("role", "is_approved", "approved_by")}),
     )
 
