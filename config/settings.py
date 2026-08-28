@@ -174,3 +174,9 @@ SOCIALACCOUNT_PROVIDERS = {
 # Redirecciones después de loguearse/desloguearse
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+#Configuracion de cookies
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 90  # 90 días, por ejemplo
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = True  # renueva el contador cada vez que usa la app, no solo al loguearse
