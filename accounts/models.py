@@ -9,7 +9,7 @@ class User(AbstractUser):
         COACH = "coach", "Entrenador"
         ATHLETE = "athlete", "Deportista"
 
-    role = models.CharField(max_length=30, choices=Role.choices, blank=Role.ATHLETE)
+    role = models.CharField(max_length=30, choices=Role.choices, default=Role.ATHLETE)
 
     # Nadie puede operar en el sistema hasta ser aprobado
     is_approved = models.BooleanField(default=False)
@@ -19,6 +19,12 @@ class User(AbstractUser):
     )
     
     birth_date = models.DateField(null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+    # Los deportistas se aprueban solos; los entrenadores los apruebo yo a mano (modelo de pago)
+        if self.role == self.Role.ATHLETE:
+            self.is_approved = True
+        super().save(*args, **kwargs)
 
     @property
     def age(self):
