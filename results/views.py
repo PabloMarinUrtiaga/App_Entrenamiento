@@ -3,12 +3,12 @@ from django.shortcuts import render
 # Create your views here.
 
 from rest_framework import generics, permissions
+from accounts.permissions import IsCoach
 from .models import Result, CoachNote
 from .serializers import ResultSerializer, CoachNoteSerializer
 
 
 class MyResultsView(generics.ListCreateAPIView):
-    # El deportista ve y carga SUS resultados
     serializer_class = ResultSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -20,20 +20,22 @@ class MyResultsView(generics.ListCreateAPIView):
 
 
 class ResultListCreateView(generics.ListCreateAPIView):
-    # El entrenador ve/carga resultados de cualquiera de sus deportistas
-    queryset = Result.objects.all()
     serializer_class = ResultSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsCoach]
+
+    def get_queryset(self):
+        return Result.objects.filter(athlete__athlete_profile__coach=self.request.user)
 
 
 class ResultDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Result.objects.all()
     serializer_class = ResultSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsCoach]
+
+    def get_queryset(self):
+        return Result.objects.filter(athlete__athlete_profile__coach=self.request.user)
 
 
 class MyCoachNotesView(generics.ListAPIView):
-    # El deportista ve las notas que le dejó su entrenador (solo lectura)
     serializer_class = CoachNoteSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -42,10 +44,11 @@ class MyCoachNotesView(generics.ListAPIView):
 
 
 class CoachNoteListCreateView(generics.ListCreateAPIView):
-    # El entrenador crea/lista notas para sus deportistas
-    queryset = CoachNote.objects.all()
     serializer_class = CoachNoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsCoach]
+
+    def get_queryset(self):
+        return CoachNote.objects.filter(coach=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(coach=self.request.user)
