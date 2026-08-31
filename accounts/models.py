@@ -9,22 +9,30 @@ class User(AbstractUser):
         COACH = "coach", "Entrenador"
         ATHLETE = "athlete", "Deportista"
 
-    role = models.CharField(max_length=30, choices=Role.choices, default=Role.ATHLETE)
-
-    # Nadie puede operar en el sistema hasta ser aprobado
+    role = models.CharField(max_length=10, choices=Role.choices, default=Role.ATHLETE)
     is_approved = models.BooleanField(default=False)
     approved_by = models.ForeignKey(
         "self", null=True, blank=True,
         on_delete=models.SET_NULL, related_name="approved_users"
     )
-    
+
+    # El usuario pide ser Entrenador, pero sigue operando como Deportista hasta que se apruebe
+    wants_to_be_coach = models.BooleanField(default=False)
+
     birth_date = models.DateField(null=True, blank=True)
-    
+
     def save(self, *args, **kwargs):
-    # Los deportistas se aprueban solos; los entrenadores los apruebo yo a mano (modelo de pago)
         if self.role == self.Role.ATHLETE:
             self.is_approved = True
         super().save(*args, **kwargs)
+
+    def approve_as_coach(self, approved_by):
+        # Vos usás esto para aprobar: recién ACÁ el rol pasa a coach de verdad
+        self.role = self.Role.COACH
+        self.is_approved = True
+        self.wants_to_be_coach = False
+        self.approved_by = approved_by
+        self.save()
 
     @property
     def age(self):
