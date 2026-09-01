@@ -1,0 +1,49 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ profile.user.get_full_name }}{% endblock %}
+{% block content %}
+<a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
+
+<h1>{{ profile.user.get_full_name|default:profile.user.username }}</h1>
+<p>
+    Posición: {{ profile.get_position_display|default:"—" }}
+    {% if profile.sub_position %}(sub: {{ profile.get_sub_position_display }}){% endif %}
+    · Edad: {{ profile.user.age|default:"—" }}
+    · Peso: {{ profile.weight_kg|default:"—" }} kg
+    · Altura: {{ profile.height_cm|default:"—" }} cm
+</p>
+
+<h2>Rutina(s) asignada(s)</h2>
+<ul>
+    {% for a in assignments %}<li>{{ a.routine.name }}</li>
+    {% empty %}<li>Sin rutina asignada.</li>{% endfor %}
+</ul>
+
+<h2>Últimos resultados</h2>
+<canvas id="resultsChart" height="100"></canvas>
+
+<h2>Asistencia reciente</h2>
+<ul>
+    {% for a in attendances %}<li>{{ a.date }}</li>
+    {% empty %}<li>Sin registros de asistencia.</li>{% endfor %}
+</ul>
+
+<h2>Notas</h2>
+<ul>
+    {% for n in notes %}<li>{{ n.created_at|date:"d/m/Y" }} — {{ n.text }}</li>
+    {% empty %}<li>Sin notas.</li>{% endfor %}
+</ul>
+
+<script>
+const resultsData = {
+    labels: [{% for r in results %}"{{ r.date|date:'d/m' }}",{% endfor %}],
+    datasets: [{
+        label: "Peso (kg)",
+        data: [{% for r in results %}{{ r.weight_kg|default:"null" }},{% endfor %}],
+    }]
+};
+new Chart(document.getElementById('resultsChart'), {
+    type: 'line',
+    data: resultsData,
+});
+</script>
+{% endblock %}
