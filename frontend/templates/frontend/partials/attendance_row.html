@@ -1,0 +1,13 @@
+<li id="athlete-row-{{ athlete.user.id }}">
+    {{ athlete.user.get_full_name|default:athlete.user.username }}
+    {% if marked %}
+        <span class="status-ok">✅ Presente</span>
+    {% else %}
+        <button
+            hx-post="{% url 'mark-attendance-htmx' athlete.user.id %}"
+            hx-target="#athlete-row-{{ athlete.user.id }}"
+            hx-swap="outerHTML">
+            Marcar presente
+        </button>
+    {% endif %}
+</li>

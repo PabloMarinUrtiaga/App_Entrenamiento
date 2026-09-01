@@ -145,21 +145,10 @@ def attendance_register(request):
     athletes = AthleteProfile.objects.filter(coach=request.user).select_related("user")
     today = timezone.localdate()
 
-    # IDs de deportistas que YA tienen asistencia marcada hoy, para no ofrecer marcarlos de nuevo
     already_marked = set(
         Attendance.objects.filter(athlete__athlete_profile__coach=request.user, date=today)
         .values_list("athlete_id", flat=True)
     )
-
-    if request.method == "POST":
-        athlete_id = request.POST.get("athlete_id")
-        athlete_profile = get_object_or_404(AthleteProfile, user_id=athlete_id, coach=request.user)
-        Attendance.objects.get_or_create(
-            athlete=athlete_profile.user,
-            date=today,
-            defaults={"registered_by": request.user},
-        )
-        return redirect("attendance-register")
 
     context = {"athletes": athletes, "already_marked": already_marked, "today": today}
     return render(request, "frontend/attendance_register.html", context)
@@ -266,3 +255,15 @@ def request_coach(request):
         return redirect("athlete-dashboard")
 
     return render(request, "frontend/request_coach.html")
+
+@login_required
+def mark_attendance_htmx(request, athlete_id):
+    if request.user.role != "coach" or request.method != "POST":
+        return redirect("athlete-dashboard")
+
+    profile = get_object_or_404(AthleteProfile, user_id=athlete_id, coach=request.user)
+    today = timezone.localdate()
+    Attendance.objects.get_or_create(
+        athlete=profile.user, date=today, defaults={"registered_by": request.user}
+    )
+    return render(request, "frontend/partials/attendance_row.html", {"athlete": profile, "marked": True})

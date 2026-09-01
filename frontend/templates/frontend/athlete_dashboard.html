@@ -15,11 +15,11 @@
     {% endfor %}
 </ul>
 
-{ <a href="{% url 'my-results' %}">Ver mis resultados y gráficos</a> }
-{ <a href="{% url 'register-result' %}">Registrar resultado</a> }
-{ <a href="{% url 'mark-attendance' %}">Marcar mi asistencia</a> }
-{ <a href="{% url 'my-notes' %}">Ver mis notas</a> }
-{ <a href="{% url 'my-profile' %}">Mi perfil</a> }
+ <a href="{% url 'my-results' %}">Ver mis resultados y gráficos</a> 
+ <a href="{% url 'register-result' %}">Registrar resultado</a> 
+ <a href="{% url 'mark-attendance' %}">Marcar mi asistencia</a> 
+ <a href="{% url 'my-notes' %}">Ver mis notas</a> 
+ <a href="{% url 'my-profile' %}">Mi perfil</a> 
 {% if not user.wants_to_be_coach %}
 <a href="{% url 'request-coach-page' %}">Quiero ser Entrenador</a>
 {% endif %}

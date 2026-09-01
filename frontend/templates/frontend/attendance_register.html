@@ -1,24 +1,17 @@
 {% extends "frontend/base.html" %}
 {% block title %}Asistencia{% endblock %}
 {% block content %}
-<a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
+<a href="{% url 'coach-dashboard' %}" class="back-link">&larr; Volver</a>
 
 <h1>Asistencia — {{ today|date:"d/m/Y" }}</h1>
 
 <ul>
     {% for athlete in athletes %}
-    <li>
-        {{ athlete.user.get_full_name|default:athlete.user.username }}
         {% if athlete.user.id in already_marked %}
-            ✅ Presente
+            {% include "frontend/partials/attendance_row.html" with marked=True %}
         {% else %}
-            <form method="post" style="display:inline">
-                {% csrf_token %}
-                <input type="hidden" name="athlete_id" value="{{ athlete.user.id }}">
-                <button type="submit">Marcar presente</button>
-            </form>
+            {% include "frontend/partials/attendance_row.html" with marked=False %}
         {% endif %}
-    </li>
     {% empty %}
     <li>Todavía no tenés deportistas asignados.</li>
     {% endfor %}
