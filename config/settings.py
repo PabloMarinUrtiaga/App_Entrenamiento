@@ -184,3 +184,5 @@ SESSION_SAVE_EVERY_REQUEST = True  # renueva el contador cada vez que usa la app
 
 #Bloquear login tradicional
 ACCOUNT_ADAPTER = "accounts.adapters.NoLocalSignupAdapter"
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
