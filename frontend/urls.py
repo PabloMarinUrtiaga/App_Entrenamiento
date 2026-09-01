@@ -3,7 +3,8 @@ from .views import (landing, coach_dashboard, athlete_dashboard,
                     athlete_detail, exercise_management,routine_management,
                     routine_detail, attendance_register, add_note,
                     register_result, my_notes,my_results,
-                    mark_attendance, my_profile)
+                    mark_attendance, my_profile, request_coach
+                    )
 
 urlpatterns = [
     path("", landing, name="landing"),
@@ -20,4 +21,5 @@ urlpatterns = [
     path("attendance/mark/", mark_attendance, name="mark-attendance"),
     path("notes/mine/", my_notes, name="my-notes"),
     path("profile/", my_profile, name="my-profile"),
+    path("request-coach/", request_coach, name="request-coach-page"),
 ]

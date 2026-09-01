@@ -254,3 +254,15 @@ def my_profile(request):
             return redirect("my-profile")
 
     return render(request, "frontend/my_profile.html", {"user_form": user_form, "athlete_form": athlete_form})
+
+@login_required
+def request_coach(request):
+    if request.user.role == "coach":
+        return redirect("coach-dashboard")
+
+    if request.method == "POST":
+        request.user.wants_to_be_coach = True
+        request.user.save()
+        return redirect("athlete-dashboard")
+
+    return render(request, "frontend/request_coach.html")

@@ -1,0 +1,13 @@
+{% extends "frontend/base.html" %}
+{% block title %}Ser Entrenador{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>Convertirme en Entrenador</h1>
+<p>Tu solicitud va a quedar pendiente de aprobación. Mientras tanto, vas a seguir usando la app como Deportista.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Solicitar ser Entrenador</button>
+</form>
+{% endblock %}
