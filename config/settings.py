@@ -181,3 +181,6 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 90  # 90 días, por ejemplo
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True  # renueva el contador cada vez que usa la app, no solo al loguearse
+
+#Bloquear login tradicional
+ACCOUNT_ADAPTER = "accounts.adapters.NoLocalSignupAdapter"
