@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 from accounts.models import User
 from teams.models import AthleteProfile
@@ -10,7 +11,7 @@ from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
 from django.utils import timezone
-from results.forms import CoachNoteForm
+from results.forms import CoachNoteForm, ResultForm
 
 
 
@@ -180,3 +181,53 @@ def add_note(request):
 
     notes = CoachNote.objects.filter(coach=request.user).select_related("athlete").order_by("-created_at")[:20]
     return render(request, "frontend/add_note.html", {"form": form, "notes": notes})
+
+@login_required
+def register_result(request):
+    if request.method == "POST":
+        form = ResultForm(request.POST)
+        if form.is_valid():
+            result = form.save(commit=False)
+            result.athlete = request.user
+            result.save()
+            return redirect("register-result")
+    else:
+        form = ResultForm()
+
+    recent = Result.objects.filter(athlete=request.user).select_related("exercise").order_by("-date")[:10]
+    return render(request, "frontend/register_result.html", {"form": form, "recent": recent})
+
+
+@login_required
+def my_results(request):
+    exercise_id = request.GET.get("exercise")
+    exercises = Exercise.objects.filter(results__athlete=request.user).distinct()
+
+    results = Result.objects.filter(athlete=request.user)
+    if exercise_id:
+        results = results.filter(exercise_id=exercise_id)
+    results = results.order_by("date")
+
+    context = {"exercises": exercises, "results": results, "selected_exercise": exercise_id}
+    return render(request, "frontend/my_results.html", context)
+
+
+@login_required
+def mark_attendance(request):
+    today = timezone.localdate()
+    already_marked = Attendance.objects.filter(athlete=request.user, date=today).exists()
+
+    if request.method == "POST" and not already_marked:
+        Attendance.objects.get_or_create(
+            athlete=request.user, date=today, defaults={"registered_by": request.user}
+        )
+        return redirect("mark-attendance")
+
+    context = {"already_marked": already_marked, "today": today}
+    return render(request, "frontend/mark_attendance.html", context)
+
+
+@login_required
+def my_notes(request):
+    notes = CoachNote.objects.filter(athlete=request.user).select_related("coach").order_by("-created_at")
+    return render(request, "frontend/my_notes.html", {"notes": notes})

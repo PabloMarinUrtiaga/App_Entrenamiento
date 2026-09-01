@@ -1,0 +1,12 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mis notas{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>Notas de mi entrenador</h1>
+<ul>
+    {% for n in notes %}
+    <li>{{ n.created_at|date:"d/m/Y" }} — {{ n.text }}</li>
+    {% empty %}<li>Todavía no tenés notas.</li>{% endfor %}
+</ul>
+{% endblock %}

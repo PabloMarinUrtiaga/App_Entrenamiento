@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (landing, coach_dashboard, athlete_dashboard,
                     athlete_detail, exercise_management,routine_management,
-                    routine_detail, attendance_register, add_note)
+                    routine_detail, attendance_register, add_note,
+                    register_result, my_notes,my_results,
+                    mark_attendance)
 
 urlpatterns = [
     path("", landing, name="landing"),
@@ -13,4 +15,8 @@ urlpatterns = [
     path("coach/routines/<int:routine_id>/", routine_detail, name="routine-detail"),
     path("coach/attendance/", attendance_register, name="attendance-register"),
     path("coach/notes/", add_note, name="add-note"),
+    path("results/register/", register_result, name="register-result"),
+    path("results/mine/", my_results, name="my-results"),
+    path("attendance/mark/", mark_attendance, name="mark-attendance"),
+    path("notes/mine/", my_notes, name="my-notes"),
 ]

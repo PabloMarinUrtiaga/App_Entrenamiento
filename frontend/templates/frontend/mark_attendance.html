@@ -1,0 +1,15 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mi asistencia{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>{{ today|date:"d/m/Y" }}</h1>
+{% if already_marked %}
+<p>✅ Ya marcaste tu asistencia hoy.</p>
+{% else %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Marcar presente</button>
+</form>
+{% endif %}
+{% endblock %}

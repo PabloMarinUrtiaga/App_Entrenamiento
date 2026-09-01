@@ -1,0 +1,19 @@
+{% extends "frontend/base.html" %}
+{% block title %}Registrar resultado{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>Registrar resultado</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+
+<h2>Últimos registros</h2>
+<ul>
+    {% for r in recent %}
+    <li>{{ r.date|date:"d/m" }} — {{ r.exercise.name }}: {{ r.reps|default:"—" }} reps, {{ r.weight_kg|default:"—" }} kg</li>
+    {% empty %}<li>Sin registros todavía.</li>{% endfor %}
+</ul>
+{% endblock %}

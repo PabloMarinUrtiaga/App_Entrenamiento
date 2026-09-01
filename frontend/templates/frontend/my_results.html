@@ -1,0 +1,32 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mis resultados{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>Mis resultados</h1>
+
+<form method="get">
+    <select name="exercise" onchange="this.form.submit()">
+        <option value="">Todos los ejercicios</option>
+        {% for e in exercises %}
+        <option value="{{ e.id }}" {% if selected_exercise == e.id|stringformat:"s" %}selected{% endif %}>{{ e.name }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<canvas id="myResultsChart" height="100"></canvas>
+
+<script>
+const data = {
+    labels: [{% for r in results %}"{{ r.date|date:'d/m' }}",{% endfor %}],
+    datasets: [{
+        label: "Peso (kg)",
+        data: [{% for r in results %}{{ r.weight_kg|default:"null" }},{% endfor %}],
+    }, {
+        label: "Reps",
+        data: [{% for r in results %}{{ r.reps|default:"null" }},{% endfor %}],
+    }]
+};
+new Chart(document.getElementById('myResultsChart'), { type: 'line', data: data });
+</script>
+{% endblock %}
