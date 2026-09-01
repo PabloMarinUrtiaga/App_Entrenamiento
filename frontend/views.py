@@ -12,6 +12,8 @@ from exercises.forms import ExerciseForm
 from exercises.models import Exercise
 from django.utils import timezone
 from results.forms import CoachNoteForm, ResultForm
+from accounts.forms import UserProfileForm
+from teams.forms import AthleteProfileForm
 
 
 
@@ -231,3 +233,24 @@ def mark_attendance(request):
 def my_notes(request):
     notes = CoachNote.objects.filter(athlete=request.user).select_related("coach").order_by("-created_at")
     return render(request, "frontend/my_notes.html", {"notes": notes})
+
+@login_required
+def my_profile(request):
+    user_form = UserProfileForm(request.POST or None, instance=request.user)
+
+    athlete_form = None
+    if request.user.role == "athlete":
+        profile, _ = AthleteProfile.objects.get_or_create(user=request.user)
+        athlete_form = AthleteProfileForm(request.POST or None, instance=profile)
+
+    if request.method == "POST":
+        user_valid = user_form.is_valid()
+        athlete_valid = athlete_form.is_valid() if athlete_form else True
+
+        if user_valid and athlete_valid:
+            user_form.save()
+            if athlete_form:
+                athlete_form.save()
+            return redirect("my-profile")
+
+    return render(request, "frontend/my_profile.html", {"user_form": user_form, "athlete_form": athlete_form})

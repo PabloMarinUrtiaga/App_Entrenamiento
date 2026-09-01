@@ -1,0 +1,17 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mi perfil{% endblock %}
+{% block content %}
+<a href="{% if request.user.role == 'coach' %}{% url 'coach-dashboard' %}{% else %}{% url 'athlete-dashboard' %}{% endif %}">&larr; Volver</a>
+
+<h1>Mi perfil</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {% if athlete_form %}
+        <h2>Datos deportivos</h2>
+        {{ athlete_form.as_p }}
+    {% endif %}
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}
