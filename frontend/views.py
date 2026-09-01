@@ -6,6 +6,8 @@ from teams.models import AthleteProfile
 from routines.models import RoutineAssignment
 from results.models import Result, CoachNote
 from attendance.models import Attendance
+from exercises.forms import ExerciseForm
+from exercises.models import Exercise
 
 
 # Create your views here.
@@ -49,3 +51,21 @@ def athlete_detail(request, athlete_id):
         "assignments": RoutineAssignment.objects.filter(athlete_id=athlete_id).select_related("routine"),
     }
     return render(request, "frontend/athlete_detail.html", context)
+
+@login_required
+def exercise_management(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    if request.method == "POST":
+        form = ExerciseForm(request.POST, request.FILES)
+        if form.is_valid():
+            exercise = form.save(commit=False)
+            exercise.created_by = request.user
+            exercise.save()
+            return redirect("exercise-management")
+    else:
+        form = ExerciseForm()
+
+    exercises = Exercise.objects.filter(created_by=request.user).order_by("-created_at")
+    return render(request, "frontend/exercise_management.html", {"form": form, "exercises": exercises})
