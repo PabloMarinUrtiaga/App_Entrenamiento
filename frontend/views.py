@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 
 from accounts.models import User
 from teams.models import AthleteProfile
-from routines.models import RoutineAssignment
+from routines.models import RoutineAssignment, Routine, RoutineExercise
+from routines.forms import RoutineForm, RoutineExerciseForm, RoutineAssignmentForm
 from results.models import Result, CoachNote
 from attendance.models import Attendance
 from exercises.forms import ExerciseForm
@@ -69,3 +70,63 @@ def exercise_management(request):
 
     exercises = Exercise.objects.filter(created_by=request.user).order_by("-created_at")
     return render(request, "frontend/exercise_management.html", {"form": form, "exercises": exercises})
+
+@login_required
+def routine_management(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    if request.method == "POST":
+        form = RoutineForm(request.POST)
+        if form.is_valid():
+            routine = form.save(commit=False)
+            routine.created_by = request.user
+            routine.save()
+            return redirect("routine-management")
+    else:
+        form = RoutineForm()
+
+    routines = Routine.objects.filter(created_by=request.user).order_by("-created_at")
+    return render(request, "frontend/routine_management.html", {"form": form, "routines": routines})
+
+
+@login_required
+def routine_detail(request, routine_id):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    routine = get_object_or_404(Routine, id=routine_id, created_by=request.user)
+
+    exercise_form = RoutineExerciseForm(
+        request.POST if request.method == "POST" and "exercise" in request.POST else None
+    )
+    assignment_form = RoutineAssignmentForm(
+        request.POST if request.method == "POST" and "athlete" in request.POST else None
+    )
+    # Solo mostrar deportistas de ESTE coach en el selector de asignación
+    assignment_form.fields["athlete"].queryset = User.objects.filter(
+        athlete_profile__coach=request.user
+    )
+
+    if request.method == "POST":
+        if "exercise" in request.POST and exercise_form.is_valid():
+            re = exercise_form.save(commit=False)
+            re.routine = routine
+            re.save()
+            return redirect("routine-detail", routine_id=routine.id)
+
+        if "athlete" in request.POST and assignment_form.is_valid():
+            assignment = assignment_form.save(commit=False)
+            assignment.routine = routine
+            assignment.assigned_by = request.user
+            assignment.save()
+            return redirect("routine-detail", routine_id=routine.id)
+
+    context = {
+        "routine": routine,
+        "exercise_form": exercise_form,
+        "assignment_form": assignment_form,
+        "routine_exercises": routine.routine_exercises.select_related("exercise"),
+        "assignments": routine.assignments.select_related("athlete"),
+    }
+    return render(request, "frontend/routine_detail.html", context)

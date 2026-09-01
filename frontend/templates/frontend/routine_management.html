@@ -1,0 +1,21 @@
+{% extends "frontend/base.html" %}
+{% block title %}Rutinas{% endblock %}
+{% block content %}
+<a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
+
+<h1>Mis rutinas</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear rutina</button>
+</form>
+
+<ul>
+    {% for routine in routines %}
+    <li><a href="{% url 'routine-detail' routine.id %}">{{ routine.name }}</a></li>
+    {% empty %}
+    <li>Todavía no creaste ninguna rutina.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

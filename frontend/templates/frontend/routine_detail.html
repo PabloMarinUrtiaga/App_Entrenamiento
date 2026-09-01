@@ -1,0 +1,40 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ routine.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'routine-management' %}">&larr; Volver</a>
+
+<h1>{{ routine.name }}</h1>
+<p>{{ routine.description }}</p>
+
+<h2>Ejercicios de la rutina</h2>
+<ul>
+    {% for re in routine_exercises %}
+    <li>{{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}</li>
+    {% empty %}
+    <li>Todavía no agregaste ejercicios.</li>
+    {% endfor %}
+</ul>
+
+<h3>Agregar ejercicio</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ exercise_form.as_p }}
+    <button type="submit">Agregar ejercicio</button>
+</form>
+
+<h2>Deportistas asignados</h2>
+<ul>
+    {% for a in assignments %}
+    <li>{{ a.athlete.get_full_name|default:a.athlete.username }}</li>
+    {% empty %}
+    <li>Todavía no asignaste esta rutina a nadie.</li>
+    {% endfor %}
+</ul>
+
+<h3>Asignar a un deportista</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ assignment_form.as_p }}
+    <button type="submit">Asignar</button>
+</form>
+{% endblock %}

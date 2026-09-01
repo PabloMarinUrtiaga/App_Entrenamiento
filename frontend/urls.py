@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import landing, coach_dashboard, athlete_dashboard, athlete_detail, exercise_management
+from .views import landing, coach_dashboard, athlete_dashboard, athlete_detail, exercise_management,routine_management, routine_detail
 
 urlpatterns = [
     path("", landing, name="landing"),
@@ -7,4 +7,6 @@ urlpatterns = [
     path("athlete/", athlete_dashboard, name="athlete-dashboard"),
     path("coach/athletes/<int:athlete_id>/", athlete_detail, name="athlete-detail"),
     path("coach/exercises/", exercise_management, name="exercise-management"),
+    path("coach/routines/", routine_management, name="routine-management"),
+    path("coach/routines/<int:routine_id>/", routine_detail, name="routine-detail"),
 ]
