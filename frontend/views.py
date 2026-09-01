@@ -9,6 +9,8 @@ from results.models import Result, CoachNote
 from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
+from attendance.models import Attendance
+from django.utils import timezone
 
 
 # Create your views here.
@@ -130,3 +132,30 @@ def routine_detail(request, routine_id):
         "assignments": routine.assignments.select_related("athlete"),
     }
     return render(request, "frontend/routine_detail.html", context)
+
+@login_required
+def attendance_register(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    athletes = AthleteProfile.objects.filter(coach=request.user).select_related("user")
+    today = timezone.localdate()
+
+    # IDs de deportistas que YA tienen asistencia marcada hoy, para no ofrecer marcarlos de nuevo
+    already_marked = set(
+        Attendance.objects.filter(athlete__athlete_profile__coach=request.user, date=today)
+        .values_list("athlete_id", flat=True)
+    )
+
+    if request.method == "POST":
+        athlete_id = request.POST.get("athlete_id")
+        athlete_profile = get_object_or_404(AthleteProfile, user_id=athlete_id, coach=request.user)
+        Attendance.objects.get_or_create(
+            athlete=athlete_profile.user,
+            date=today,
+            defaults={"registered_by": request.user},
+        )
+        return redirect("attendance-register")
+
+    context = {"athletes": athletes, "already_marked": already_marked, "today": today}
+    return render(request, "frontend/attendance_register.html", context)

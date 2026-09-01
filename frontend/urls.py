@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import landing, coach_dashboard, athlete_dashboard, athlete_detail, exercise_management,routine_management, routine_detail
+from .views import (landing, coach_dashboard, athlete_dashboard,
+                    athlete_detail, exercise_management,routine_management,
+                    routine_detail, attendance_register)
 
 urlpatterns = [
     path("", landing, name="landing"),
@@ -9,4 +11,5 @@ urlpatterns = [
     path("coach/exercises/", exercise_management, name="exercise-management"),
     path("coach/routines/", routine_management, name="routine-management"),
     path("coach/routines/<int:routine_id>/", routine_detail, name="routine-detail"),
+    path("coach/attendance/", attendance_register, name="attendance-register"),
 ]
