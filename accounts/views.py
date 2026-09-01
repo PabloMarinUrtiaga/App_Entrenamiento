@@ -1,6 +1,7 @@
 # Create your views here.
 
 from rest_framework import generics, permissions
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import UserSerializer
 
@@ -12,11 +13,8 @@ class MeView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-class RequestCoachView(generics.UpdateAPIView):
+class RequestCoachView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
 
     def patch(self, request, *args, **kwargs):
         request.user.wants_to_be_coach = True

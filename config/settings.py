@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "routines",
     "attendance",
     "results",
+    "frontend",
 ]
 
 SITE_ID = 1
