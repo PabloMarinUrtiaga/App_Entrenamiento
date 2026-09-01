@@ -9,8 +9,9 @@ from results.models import Result, CoachNote
 from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
-from attendance.models import Attendance
 from django.utils import timezone
+from results.forms import CoachNoteForm
+
 
 
 # Create your views here.
@@ -159,3 +160,23 @@ def attendance_register(request):
 
     context = {"athletes": athletes, "already_marked": already_marked, "today": today}
     return render(request, "frontend/attendance_register.html", context)
+
+@login_required
+def add_note(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    if request.method == "POST":
+        form = CoachNoteForm(request.POST)
+        form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.coach = request.user
+            note.save()
+            return redirect("add-note")
+    else:
+        form = CoachNoteForm()
+        form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
+
+    notes = CoachNote.objects.filter(coach=request.user).select_related("athlete").order_by("-created_at")[:20]
+    return render(request, "frontend/add_note.html", {"form": form, "notes": notes})

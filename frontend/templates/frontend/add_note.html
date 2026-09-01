@@ -1,0 +1,22 @@
+{% extends "frontend/base.html" %}
+{% block title %}Notas{% endblock %}
+{% block content %}
+<a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
+
+<h1>Agregar nota</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar nota</button>
+</form>
+
+<h2>Últimas notas</h2>
+<ul>
+    {% for note in notes %}
+    <li>{{ note.created_at|date:"d/m/Y" }} — {{ note.athlete.get_full_name|default:note.athlete.username }}: {{ note.text }}</li>
+    {% empty %}
+    <li>Todavía no escribiste ninguna nota.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
