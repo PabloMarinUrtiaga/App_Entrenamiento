@@ -11,5 +11,21 @@
 </head>
 <body>
     {% block content %}{% endblock %}
+
+    {% if user.is_authenticated %}
+<nav class="bottom-nav">
+    {% if user.role == "coach" %}
+        <a href="{% url 'coach-dashboard' %}">Deportistas</a>
+        <a href="{% url 'exercise-management' %}">Ejercicios</a>
+        <a href="{% url 'routine-management' %}">Rutinas</a>
+        <a href="{% url 'attendance-register' %}">Asistencia</a>
+    {% else %}
+        <a href="{% url 'athlete-dashboard' %}">Inicio</a>
+        <a href="{% url 'my-results' %}">Resultados</a>
+        <a href="{% url 'mark-attendance' %}">Asistencia</a>
+    {% endif %}
+    <a href="{% url 'my-profile' %}">Perfil</a>
+</nav>
+{% endif %}
 </body>
 </html>

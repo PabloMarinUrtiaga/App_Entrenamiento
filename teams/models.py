@@ -30,7 +30,6 @@ class AthleteProfile(models.Model):
     )
     sub_position = models.CharField(
         max_length=20, choices=Position.choices, blank=True,
-        help_text="Ej: Lateral que a veces juega de Pivot",
     )
     
     weight_kg = models.DecimalField(

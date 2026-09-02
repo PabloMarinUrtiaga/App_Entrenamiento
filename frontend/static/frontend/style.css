@@ -1,60 +1,113 @@
 * { box-sizing: border-box; }
 
+:root {
+    --bg-page: #22262A;
+    --bg-surface: #2E3338;
+    --bg-surface-alt: #383E44;
+    --border: #454B52;
+    --text-primary: #F1EFE8;
+    --text-secondary: #B4B2A9;
+    --text-muted: #888780;
+    --accent: #1D9E75;
+    --accent-hover: #0F6E56;
+    --accent-bg: #0B3E32;
+    --accent-text: #5DCAA5;
+    --danger-bg: #4A1B0C;
+    --danger-text: #F0997B;
+}
+
 body {
     font-family: -apple-system, system-ui, sans-serif;
     max-width: 480px;
     margin: 0 auto;
-    padding: 16px;
-    background: #f5f5f4;
-    color: #1c1c1a;
+    padding: 16px 16px 80px;
+    background: var(--bg-page);
+    color: var(--text-primary);
 }
 
-h1 { font-size: 1.4rem; margin: 8px 0 16px; }
-h2 { font-size: 1.1rem; margin: 20px 0 8px; }
-h3 { font-size: 1rem; margin: 16px 0 8px; }
+h1 { font-size: 1.4rem; margin: 8px 0 16px; font-weight: 600; }
+h2 { font-size: 1.05rem; margin: 20px 0 10px; color: var(--text-secondary); font-weight: 600; }
+h3 { font-size: 0.95rem; margin: 16px 0 8px; }
 
-a { color: #2563eb; text-decoration: none; }
+a { color: var(--accent-text); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.back-link { display: inline-block; margin-bottom: 12px; font-size: 0.9rem; }
+.back-link { display: inline-block; margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted); }
 
 ul { list-style: none; padding: 0; margin: 0; }
 
 li {
-    background: white;
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 form { margin: 12px 0; }
+form p { margin: 12px 0; }
 
-form p { margin: 8px 0; }
-
-label { font-size: 0.85rem; color: #555; display: block; margin-bottom: 2px; }
+label { font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 4px; }
 
 input, select, textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    padding: 10px;
+    background: var(--bg-surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
     font-size: 1rem;
 }
-
-button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
 }
 
-button:hover { background: #1d4ed8; }
+/* Botón primario: una sola acción principal por pantalla */
+button, .btn-primary {
+    background: var(--accent);
+    color: #0B1F19;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+button:hover, .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+/* Botón secundario: acciones de menor jerarquía */
+.btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+/* Badges de estado — asistencia, aprobación pendiente */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 100px;
+}
+.badge-success { background: var(--accent-bg); color: var(--accent-text); }
+.badge-warning { background: #422C09; color: #EF9F27; }
+
+.banner {
+    background: var(--bg-surface-alt);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
 
 .dashboard-links {
     display: flex;
@@ -62,12 +115,47 @@ button:hover { background: #1d4ed8; }
     gap: 8px;
     margin-top: 16px;
 }
-
 .dashboard-links a {
-    background: white;
-    padding: 12px;
-    border-radius: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: 10px;
     text-align: center;
+    color: var(--text-primary);
+    font-weight: 500;
 }
+.dashboard-links a:hover { border-color: var(--accent); text-decoration: none; }
 
-.status-ok { color: #16a34a; font-weight: 600; }
+/* Navegación inferior fija — la app se usa parada, con el celular en mano */
+.bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.bottom-nav a {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-align: center;
+    flex: 1;
+}
+.bottom-nav a.active { color: var(--accent-text); }
+
+.btn-danger {
+    background: transparent;
+    color: var(--danger-text);
+    border: 1px solid #712B13;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 24px;
+    cursor: pointer;
+}
+.btn-danger:hover { background: var(--danger-bg); }

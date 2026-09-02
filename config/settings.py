@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "django.contrib.sites",  # requerido por allauth
+    
+    "frontend",
 
     # Terceros
     "rest_framework",
@@ -57,7 +59,6 @@ INSTALLED_APPS = [
     "routines",
     "attendance",
     "results",
-    "frontend",
 ]
 
 SITE_ID = 1
@@ -190,3 +191,5 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 #IMAGENES
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+ACCOUNT_LOGOUT_ON_GET = True

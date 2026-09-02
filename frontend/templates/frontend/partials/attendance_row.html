@@ -1,7 +1,7 @@
 <li id="athlete-row-{{ athlete.user.id }}">
     {{ athlete.user.get_full_name|default:athlete.user.username }}
     {% if marked %}
-        <span class="status-ok">✅ Presente</span>
+        <span class="badge badge-success">Presente✅</span>
     {% else %}
         <button
             hx-post="{% url 'mark-attendance-htmx' athlete.user.id %}"

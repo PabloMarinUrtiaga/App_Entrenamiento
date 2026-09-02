@@ -1,7 +1,7 @@
 {% extends "frontend/base.html" %}
 {% block title %}Mi perfil{% endblock %}
 {% block content %}
-<a href="{% if request.user.role == 'coach' %}{% url 'coach-dashboard' %}{% else %}{% url 'athlete-dashboard' %}{% endif %}">&larr; Volver</a>
+<a href="{% if request.user.role == 'coach' %}{% url 'coach-dashboard' %}{% else %}{% url 'athlete-dashboard' %}{% endif %}" class="back-link">&larr; Volver</a>
 
 <h1>Mi perfil</h1>
 
@@ -14,4 +14,6 @@
     {% endif %}
     <button type="submit">Guardar</button>
 </form>
+
+<a href="{% url 'account_logout' %}" class="btn-danger" style="display:block; text-align:center; text-decoration:none;">Cerrar sesión</a>
 {% endblock %}

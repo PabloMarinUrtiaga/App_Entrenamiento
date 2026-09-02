@@ -1,0 +1,9 @@
+{% extends "frontend/base.html" %}
+{% block title %}Cerrar sesión{% endblock %}
+{% block content %}
+<h1>¿Cerrar sesión?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirmar salida</button>
+</form>
+{% endblock %}
