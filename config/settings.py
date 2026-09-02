@@ -169,7 +169,7 @@ SOCIALACCOUNT_PROVIDERS = {
             "key": "",
         },
         "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
+        "AUTH_PARAMS": {"access_type": "online", "prompt": "select_account"},
     }
 }
 
@@ -185,6 +185,8 @@ SESSION_SAVE_EVERY_REQUEST = True  # renueva el contador cada vez que usa la app
 
 #Bloquear login tradicional
 ACCOUNT_ADAPTER = "accounts.adapters.NoLocalSignupAdapter"
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.SocialSignupAdapter"
+
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
