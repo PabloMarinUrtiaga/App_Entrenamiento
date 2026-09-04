@@ -42,3 +42,35 @@ class AthleteProfile(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.get_position_display() or 'sin posición'}"
+    
+class AthleteGroup(models.Model):
+    coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={"role": "coach"}, related_name="athlete_groups")
+    name = models.CharField(max_length=50)
+    athletes = models.ManyToManyField(AthleteProfile, blank=True, related_name="groups")
+
+class CoachInvitation(models.Model):
+    # Invitación in-app de un Coach a un Deportista ya registrado, por Gmail
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pendiente"
+        ACCEPTED = "accepted", "Aceptada"
+        REJECTED = "rejected", "Rechazada"
+
+    coach = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_invitations",
+        limit_choices_to={"role": "coach"},
+    )
+    athlete = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="received_invitations",
+        limit_choices_to={"role": "athlete"},
+    )
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.PENDING
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.coach} -> {self.athlete} ({self.get_status_display()})"
