@@ -3,7 +3,8 @@ from .views import (landing, coach_dashboard, athlete_dashboard,
                     athlete_detail, exercise_management,routine_management,
                     routine_detail, attendance_register, add_note,
                     register_result, my_notes,my_results,
-                    mark_attendance, my_profile, request_coach, mark_attendance_htmx
+                    mark_attendance, my_profile, request_coach, mark_attendance_htmx,
+                    invite_athlete
                     )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path("profile/", my_profile, name="my-profile"),
     path("request-coach/", request_coach, name="request-coach-page"),
     path("coach/attendance/mark/<int:athlete_id>/", mark_attendance_htmx, name="mark-attendance-htmx"),
+    path("invite-athlete/", invite_athlete, name="invite-athlete-page"),
 ]

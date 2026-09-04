@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 
 from accounts.models import User
-from teams.models import AthleteProfile
-from routines.models import RoutineAssignment, Routine, RoutineExercise
+from teams.models import AthleteProfile, CoachInvitation
+from routines.models import RoutineAssignment, Routine
 from routines.forms import RoutineForm, RoutineExerciseForm, RoutineAssignmentForm
 from results.models import Result, CoachNote
 from attendance.models import Attendance
@@ -267,3 +267,22 @@ def mark_attendance_htmx(request, athlete_id):
         athlete=profile.user, date=today, defaults={"registered_by": request.user}
     )
     return render(request, "frontend/partials/attendance_row.html", {"athlete": profile, "marked": True})
+
+@login_required
+def invite_athlete(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    sent = False
+    error = None
+
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip()
+        athlete = User.objects.filter(email__iexact=email, role="athlete").first()
+        if athlete:
+            CoachInvitation.objects.create(coach=request.user, athlete=athlete)
+            sent = True
+        else:
+            error = "No hay ningún Deportista registrado con ese email."
+
+    return render(request, "frontend/invite_athlete.html", {"sent": sent, "error": error})
