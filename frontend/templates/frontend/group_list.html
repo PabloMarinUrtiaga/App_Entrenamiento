@@ -1,0 +1,28 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mis grupos{% endblock %}
+{% block content %}
+<h1>Mis grupos</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Nombre del grupo" required>
+    <button type="submit">Crear grupo</button>
+</form>
+
+<ul>
+    {% for group in groups %}
+    <li>
+        <strong><a href="{% url 'group-detail' group.id %}">{{ group.name }}</a></strong>
+        <ul>
+            {% for profile in group.athletes.all %}
+            <li>{{ profile.user.get_full_name|default:profile.user.username }}</li>
+            {% empty %}
+            <li>Sin deportistas todavía.</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% empty %}
+    <li>Todavía no creaste ningún grupo.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

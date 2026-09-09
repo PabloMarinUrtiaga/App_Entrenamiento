@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 
 from accounts.models import User
-from teams.models import AthleteProfile, CoachInvitation
+from teams.models import AthleteProfile, CoachInvitation, AthleteGroup
 from routines.models import RoutineAssignment, Routine
 from routines.forms import RoutineForm, RoutineExerciseForm, RoutineAssignmentForm
 from results.models import Result, CoachNote
@@ -34,6 +34,45 @@ def coach_dashboard(request):
 
     athletes = AthleteProfile.objects.filter(coach=request.user).select_related("user")
     return render(request, "frontend/coach_dashboard.html", {"athletes": athletes})
+
+@login_required
+def group_list(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            AthleteGroup.objects.create(coach=request.user, name=name)
+        return redirect("group-list")
+
+    groups = AthleteGroup.objects.filter(coach=request.user).prefetch_related("athletes__user")
+    return render(request, "frontend/group_list.html", {"groups": groups})
+
+@login_required
+def group_detail(request, group_id):
+    group = get_object_or_404(AthleteGroup, id=group_id, coach=request.user)
+
+    if request.method == "POST":
+        athlete_id = request.POST.get("athlete_id")
+        action = request.POST.get("action")
+        # Solo deja tocar deportistas que son del Coach dueño del grupo
+        profile = get_object_or_404(AthleteProfile, id=athlete_id, coach=request.user)
+
+        if action == "add":
+            group.athletes.add(profile)
+        elif action == "remove":
+            group.athletes.remove(profile)
+
+        return redirect("group-detail", group_id=group.id)
+
+    members = group.athletes.select_related("user")
+    available = AthleteProfile.objects.filter(coach=request.user).exclude(id__in=members).select_related("user")
+    return render(request, "frontend/group_detail.html", {
+        "group": group,
+        "members": members,
+        "available": available,
+    })
 
 
 @login_required

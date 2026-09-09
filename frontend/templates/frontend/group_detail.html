@@ -1,0 +1,39 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'group-list' %}">&larr; Volver a mis grupos</a>
+
+<h1>{{ group.name }}</h1>
+
+<h2>Miembros</h2>
+<ul>
+    {% for profile in members %}
+    <li>
+        {{ profile.user.get_full_name|default:profile.user.username }}
+        <form method="post" style="display:inline">
+            {% csrf_token %}
+            <input type="hidden" name="athlete_id" value="{{ profile.id }}">
+            <button type="submit" name="action" value="remove">Sacar del grupo</button>
+        </form>
+    </li>
+    {% empty %}
+    <li>Sin deportistas todavía.</li>
+    {% endfor %}
+</ul>
+
+<h2>Agregar deportista</h2>
+<ul>
+    {% for profile in available %}
+    <li>
+        {{ profile.user.get_full_name|default:profile.user.username }}
+        <form method="post" style="display:inline">
+            {% csrf_token %}
+            <input type="hidden" name="athlete_id" value="{{ profile.id }}">
+            <button type="submit" name="action" value="add">Agregar</button>
+        </form>
+    </li>
+    {% empty %}
+    <li>No tenés más deportistas para agregar.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

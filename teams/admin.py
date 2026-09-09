@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AthleteProfile, CoachInvitation
+from .models import AthleteProfile, CoachInvitation, AthleteGroup
 
 # Register your models here.
 
@@ -14,6 +14,12 @@ class CoachInvitationAdmin(admin.ModelAdmin):
     list_filter = ("status",)
     search_fields = ("coach__username", "athlete__username", "athlete__email")
 
+class AthleteGroupAdmin(admin.ModelAdmin):
+    list_display = ("name", "coach")
+    list_filter = ("coach",)
+    filter_horizontal = ("athletes",)
+
 
 admin.site.register(AthleteProfile, AthleteProfileAdmin)
 admin.site.register(CoachInvitation, CoachInvitationAdmin)
+admin.site.register(AthleteGroup, AthleteGroupAdmin)

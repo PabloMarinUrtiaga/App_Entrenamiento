@@ -43,11 +43,7 @@ class AthleteProfile(models.Model):
     def __str__(self):
         return f"{self.user} - {self.get_position_display() or 'sin posición'}"
     
-class AthleteGroup(models.Model):
-    coach = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={"role": "coach"}, related_name="athlete_groups")
-    name = models.CharField(max_length=50)
-    athletes = models.ManyToManyField(AthleteProfile, blank=True, related_name="groups")
-
+    
 class CoachInvitation(models.Model):
     # Invitación in-app de un Coach a un Deportista ya registrado, por Gmail
     class Status(models.TextChoices):
@@ -74,3 +70,17 @@ class CoachInvitation(models.Model):
 
     def __str__(self):
         return f"{self.coach} -> {self.athlete} ({self.get_status_display()})"
+    
+class AthleteGroup(models.Model):
+    # Grupo de deportistas de un Coach (ej: Menores, Mayores, Juniors, Gimnasio)
+    coach = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="athlete_groups",
+        limit_choices_to={"role": "coach"},
+    )
+    name = models.CharField(max_length=50)
+    athletes = models.ManyToManyField(AthleteProfile, blank=True, related_name="groups")
+
+    def __str__(self):
+        return f"{self.name} ({self.coach})"
