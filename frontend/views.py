@@ -40,7 +40,13 @@ def coach_dashboard(request):
 def athlete_dashboard(request):
     # El banner de "pendiente de aprobación como Entrenador" se muestra acá mismo
     assignments = RoutineAssignment.objects.filter(athlete=request.user).select_related("routine")
-    return render(request, "frontend/athlete_dashboard.html", {"assignments": assignments})
+    pending_invitations = CoachInvitation.objects.filter(
+        athlete=request.user, status=CoachInvitation.Status.PENDING
+    ).select_related("coach")
+    return render(request, "frontend/athlete_dashboard.html", {
+        "assignments": assignments,
+        "pending_invitations": pending_invitations,
+    })
 
 @login_required
 def athlete_detail(request, athlete_id):
@@ -286,3 +292,25 @@ def invite_athlete(request):
             error = "No hay ningún Deportista registrado con ese email."
 
     return render(request, "frontend/invite_athlete.html", {"sent": sent, "error": error})
+
+@login_required
+def respond_invitation(request, invitation_id):
+    if request.method != "POST":
+        return redirect("athlete-dashboard")
+
+    invitation = get_object_or_404(
+        CoachInvitation, id=invitation_id, athlete=request.user, status=CoachInvitation.Status.PENDING
+    )
+    action = request.POST.get("action")
+
+    if action == "accept":
+        invitation.status = CoachInvitation.Status.ACCEPTED
+        invitation.save()
+        profile = request.user.athlete_profile
+        profile.coach = invitation.coach
+        profile.save()
+    elif action == "reject":
+        invitation.status = CoachInvitation.Status.REJECTED
+        invitation.save()
+
+    return redirect("athlete-dashboard")

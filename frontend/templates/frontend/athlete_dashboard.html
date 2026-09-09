@@ -6,6 +6,17 @@
 <div class="banner">Tu solicitud para ser Entrenador está pendiente de aprobación. Mientras tanto, podés seguir usando la app como Deportista.</div>
 {% endif %}
 
+{% for invitation in pending_invitations %}
+<div class="banner">
+    {{ invitation.coach.get_full_name|default:invitation.coach.username }} te invitó a ser su Deportista.
+    <form method="post" action="{% url 'respond-invitation' invitation.id %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" name="action" value="accept">Aceptar</button>
+        <button type="submit" name="action" value="reject">Rechazar</button>
+    </form>
+</div>
+{% endfor %}
+
 <h1>Mi rutina</h1>
 <ul>
     {% for assignment in assignments %}
