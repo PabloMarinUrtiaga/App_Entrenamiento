@@ -1,0 +1,16 @@
+{% extends "frontend/base.html" %}
+{% block title %}Mis grupos{% endblock %}
+{% block content %}
+<h1>Mis grupos</h1>
+
+<ul>
+    {% for group in groups %}
+    <li>
+        {{ group.name }} — Coach: {{ group.coach.get_full_name|default:group.coach.username }}
+        <a href="{% url 'leave-group' group.id %}">Salir</a>
+    </li>
+    {% empty %}
+    <li>Todavía no pertenecés a ningún grupo.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

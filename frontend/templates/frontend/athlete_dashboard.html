@@ -29,6 +29,7 @@
 <div class="dashboard-links">
     <a href="{% url 'register-result' %}">Registrar resultado</a>
     <a href="{% url 'my-notes' %}">Ver mis notas</a>
+    <a href="{% url 'my-groups' %}">Mis grupos</a>
     {% if not user.wants_to_be_coach %}
     <a href="{% url 'request-coach-page' %}">Quiero ser Entrenador</a>
     {% endif %}

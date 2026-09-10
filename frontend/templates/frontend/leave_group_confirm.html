@@ -1,0 +1,13 @@
+{% extends "frontend/base.html" %}
+{% block title %}Salir de {{ group.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'my-groups' %}">&larr; Volver</a>
+
+<h1>¿Salir de "{{ group.name }}"?</h1>
+<p>Solo podrás volver a entrar si te vuelve a agregar tu coach.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, salir del grupo</button>
+</form>
+{% endblock %}

@@ -88,6 +88,26 @@ def athlete_dashboard(request):
     })
 
 @login_required
+def my_groups(request):
+    if request.user.role != "athlete":
+        return redirect("coach-dashboard")
+
+    profile, _ = AthleteProfile.objects.get_or_create(user=request.user)
+    groups = profile.groups.select_related("coach")
+    return render(request, "frontend/my_groups.html", {"groups": groups})
+
+@login_required
+def leave_group(request, group_id):
+    profile, _ = AthleteProfile.objects.get_or_create(user=request.user)
+    group = get_object_or_404(AthleteGroup, id=group_id, athletes=profile)
+
+    if request.method == "POST":
+        group.athletes.remove(profile)
+        return redirect("my-groups")
+
+    return render(request, "frontend/leave_group_confirm.html", {"group": group})
+
+@login_required
 def athlete_detail(request, athlete_id):
     if request.user.role != "coach":
         return redirect("athlete-dashboard")
