@@ -1,0 +1,21 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}{{ routine.name }}{% endblock %}
+{% block content %}
+<a href="{% url 'athlete-dashboard' %}">&larr; Volver</a>
+
+<h1>{{ routine.name }}</h1>
+<p>{{ routine.description }}</p>
+
+<h2>Ejercicios</h2>
+<ul>
+    {% for re in routine_exercises %}
+    <li>
+        {{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}
+        {% if re.exercise.catalog_slug %}<br><img src="{% static re.exercise.illustration_static_path %}" width="80">{% endif %}
+    </li>
+    {% empty %}
+    <li>Esta rutina todavía no tiene ejercicios cargados.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

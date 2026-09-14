@@ -86,6 +86,21 @@ def athlete_dashboard(request):
         "assignments": assignments,
         "pending_invitations": pending_invitations,
     })
+    
+@login_required
+def my_routine_detail(request, routine_id):
+    if request.user.role != "athlete":
+        return redirect("coach-dashboard")
+
+    assignment = get_object_or_404(
+        RoutineAssignment.objects.select_related("routine"),
+        routine_id=routine_id, athlete=request.user
+    )
+    routine_exercises = assignment.routine.routine_exercises.select_related("exercise")
+    return render(request, "frontend/my_routine_detail.html", {
+        "routine": assignment.routine,
+        "routine_exercises": routine_exercises,
+    })
 
 @login_required
 def my_groups(request):

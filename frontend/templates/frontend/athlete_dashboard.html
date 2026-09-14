@@ -20,7 +20,7 @@
 <h1>Mi rutina</h1>
 <ul>
     {% for assignment in assignments %}
-    <li>{{ assignment.routine.name }}</li>
+    <li><a href="{% url 'my-routine-detail' assignment.routine.id %}">{{ assignment.routine.name }}</a></li>
     {% empty %}
     <li>Todavía no tenés ninguna rutina asignada.</li>
     {% endfor %}
