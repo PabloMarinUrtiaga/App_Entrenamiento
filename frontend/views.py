@@ -217,6 +217,9 @@ def routine_detail(request, routine_id):
     exercise_form = RoutineExerciseForm(
         request.POST if request.method == "POST" and "exercise" in request.POST else None
     )
+    # Solo mostrar ejercicios creados por ESTE coach en el selector
+    exercise_form.fields["exercise"].queryset = Exercise.objects.filter(created_by=request.user)
+    
     assignment_form = RoutineAssignmentForm(
         request.POST if request.method == "POST" and "athlete" in request.POST else None
     )
