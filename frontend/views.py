@@ -143,6 +143,21 @@ def athlete_detail(request, athlete_id):
 def exercise_management(request):
     if request.user.role != "coach":
         return redirect("athlete-dashboard")
+    return render(request, "frontend/exercise_management.html")
+
+
+@login_required
+def exercise_list(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+    exercises = Exercise.objects.filter(created_by=request.user).order_by("-created_at")
+    return render(request, "frontend/exercise_list.html", {"exercises": exercises})
+
+
+@login_required
+def exercise_create(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
 
     if request.method == "POST":
         form = ExerciseForm(request.POST, request.FILES)
@@ -150,12 +165,11 @@ def exercise_management(request):
             exercise = form.save(commit=False)
             exercise.created_by = request.user
             exercise.save()
-            return redirect("exercise-management")
+            return redirect("exercise-list")
     else:
         form = ExerciseForm()
 
-    exercises = Exercise.objects.filter(created_by=request.user).order_by("-created_at")
-    return render(request, "frontend/exercise_management.html", {"form": form, "exercises": exercises})
+        return render(request, "frontend/exercise_create.html", {"form": form})
 
 @login_required
 def routine_management(request):

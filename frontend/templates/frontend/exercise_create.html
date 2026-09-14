@@ -1,0 +1,13 @@
+{% extends "frontend/base.html" %}
+{% block title %}Crear ejercicio{% endblock %}
+{% block content %}
+<a href="{% url 'exercise-management' %}">&larr; Volver</a>
+
+<h1>Crear ejercicio</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear ejercicio</button>
+</form>
+{% endblock %}

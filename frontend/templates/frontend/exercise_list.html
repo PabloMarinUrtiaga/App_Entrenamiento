@@ -1,0 +1,21 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Mis ejercicios{% endblock %}
+{% block content %}
+<a href="{% url 'exercise-management' %}">&larr; Volver</a>
+
+<h1>Mis ejercicios</h1>
+
+<ul>
+    {% for exercise in exercises %}
+    <li>
+        <strong>{{ exercise.name }}</strong>
+        {% if exercise.image %}<br><img src="{{ exercise.image.url }}" width="100">{% endif %}
+        {% if exercise.catalog_slug %}<br><img src="{% static exercise.illustration_static_path %}" width="100">{% endif %}
+        {% if exercise.youtube_url %}<br><a href="{{ exercise.youtube_url }}" target="_blank">Ver video</a>{% endif %}
+    </li>
+    {% empty %}
+    <li>Todavía no creaste ningún ejercicio.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

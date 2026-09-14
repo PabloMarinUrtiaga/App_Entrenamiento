@@ -1,27 +1,13 @@
 {% extends "frontend/base.html" %}
-{% load static %}
 {% block title %}Ejercicios{% endblock %}
 {% block content %}
 <a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
 
-<h1>Mis ejercicios</h1>
+<h1>Ejercicios</h1>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Crear ejercicio</button>
-</form>
+<div class="dashboard-links">
+    <a href="{% url 'exercise-list' %}">Ver ejercicios</a>
+    <a href="{% url 'exercise-create' %}">Crear</a>
+</div>
 
-<ul>
-    {% for exercise in exercises %}
-    <li>
-        <strong>{{ exercise.name }}</strong>
-        {% if exercise.image %}<br><img src="{{ exercise.image.url }}" width="100">{% endif %}
-        {% if exercise.catalog_slug %}<br><img src="{% static exercise.illustration_static_path %}" width="100">{% endif %}
-        {% if exercise.youtube_url %}<br><a href="{{ exercise.youtube_url }}" target="_blank">Ver video</a>{% endif %}
-    </li>
-    {% empty %}
-    <li>Todavía no creaste ningún ejercicio.</li>
-    {% endfor %}
-</ul>
 {% endblock %}
