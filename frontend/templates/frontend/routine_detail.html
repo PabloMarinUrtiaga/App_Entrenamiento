@@ -1,4 +1,5 @@
 {% extends "frontend/base.html" %}
+{% load static %}
 {% block title %}{{ routine.name }}{% endblock %}
 {% block content %}
 <a href="{% url 'routine-management' %}">&larr; Volver</a>
@@ -9,7 +10,10 @@
 <h2>Ejercicios de la rutina</h2>
 <ul>
     {% for re in routine_exercises %}
-    <li>{{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}</li>
+    <li>
+        {{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}
+        {% if re.exercise.catalog_slug %}<br><img src="{% static re.exercise.illustration_static_path %}" width="80">{% endif %}
+    </li>
     {% empty %}
     <li>Todavía no agregaste ejercicios.</li>
     {% endfor %}
