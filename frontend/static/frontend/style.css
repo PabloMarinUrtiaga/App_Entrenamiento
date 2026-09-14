@@ -158,4 +158,25 @@ button:hover, .btn-primary:hover { background: var(--accent-hover); color: white
     margin-top: 24px;
     cursor: pointer;
 }
-.btn-danger:hover { background: var(--danger-bg); }
+
+.btn-danger:hover { background: var(--danger-bg); 
+}
+
+.details-toggle summary {
+    cursor: pointer;
+    display: inline-block;
+    padding: 6px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-surface-alt);
+    color: var(--text-primary);
+}
+
+.details-toggle summary:hover {
+    border-color: var(--accent);
+}
+
+.form-submit {
+    margin-top: 2rem;
+}

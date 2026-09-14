@@ -9,7 +9,7 @@
 <ul>
     {% for exercise in exercises %}
     <li>
-        <strong>{{ exercise.name }}</strong>
+        <strong><a href="{% url 'exercise-edit' exercise.id %}">{{ exercise.name }}</a></strong>
         {% if exercise.image %}<br><img src="{{ exercise.image.url }}" width="100">{% endif %}
         {% if exercise.catalog_slug %}<br><img src="{% static exercise.illustration_static_path %}" width="100">{% endif %}
         {% if exercise.youtube_url %}<br><a href="{{ exercise.youtube_url }}" target="_blank">Ver video</a>{% endif %}

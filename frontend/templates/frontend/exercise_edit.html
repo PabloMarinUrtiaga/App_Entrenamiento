@@ -1,9 +1,9 @@
 {% extends "frontend/base.html" %}
-{% block title %}Crear ejercicio{% endblock %}
+{% block title %}Editar {{ exercise.name }}{% endblock %}
 {% block content %}
-<a href="{% url 'exercise-management' %}">&larr; Volver</a>
+<a href="{% url 'exercise-list' %}">&larr; Volver</a>
 
-<h1>Crear ejercicio</h1>
+<h1>Editar ejercicio</h1>
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}

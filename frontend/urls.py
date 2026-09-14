@@ -5,7 +5,8 @@ from .views import (landing, coach_dashboard, athlete_dashboard,
                     register_result, my_notes,my_results,
                     mark_attendance, my_profile, request_coach, mark_attendance_htmx,
                     invite_athlete,respond_invitation, group_list, group_detail,
-                    my_groups, leave_group, my_routine_detail, exercise_create, exercise_list
+                    my_groups, leave_group, my_routine_detail, exercise_create, exercise_list,
+                    exercise_edit
                     
                     )
 
@@ -35,4 +36,5 @@ urlpatterns = [
     path("athlete/routines/<int:routine_id>/", my_routine_detail, name="my-routine-detail"),
     path("coach/exercises/list/", exercise_list, name="exercise-list"),
     path("coach/exercises/create/", exercise_create, name="exercise-create"),
+    path("coach/exercises/<int:exercise_id>/edit/", exercise_edit, name="exercise-edit"),
 ]
