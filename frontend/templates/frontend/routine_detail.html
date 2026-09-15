@@ -11,8 +11,12 @@
 <ul>
     {% for re in routine_exercises %}
     <li>
-        {{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}
-        {% if re.exercise.catalog_slug %}<br><img src="{% static re.exercise.illustration_static_path %}" width="80">{% endif %}
+    {{ re.order }}. {{ re.exercise.name }} — {{ re.sets|default:"—" }}x{{ re.reps|default:"—" }} {{ re.notes }}
+    {% if re.exercise.catalog_slug %}<br><img src="{% static re.exercise.illustration_static_path %}" width="80">{% endif %}
+    <form method="post" action="{% url 'remove-routine-exercise' re.id %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn-remove" title="Eliminar de la rutina">×</button>
+    </form>
     </li>
     {% empty %}
     <li>Todavía no agregaste ejercicios.</li>

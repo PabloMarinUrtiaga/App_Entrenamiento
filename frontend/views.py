@@ -5,7 +5,7 @@ from django.db.models import Count
 from accounts.models import User
 from teams.models import AthleteProfile, CoachInvitation, AthleteGroup
 from routines.models import RoutineAssignment, Routine
-from routines.forms import RoutineForm, RoutineExerciseForm, RoutineAssignmentForm
+from routines.forms import RoutineForm, RoutineExerciseForm, RoutineAssignmentForm, RoutineExercise
 from results.models import Result, CoachNote
 from attendance.models import Attendance
 from exercises.forms import ExerciseForm
@@ -250,6 +250,18 @@ def routine_detail(request, routine_id):
         "assignments": routine.assignments.select_related("athlete"),
     }
     return render(request, "frontend/routine_detail.html", context)
+
+@login_required
+def remove_routine_exercise(request, re_id):
+    if request.method != "POST":
+        return redirect("coach-dashboard")
+
+    routine_exercise = get_object_or_404(
+        RoutineExercise, id=re_id, routine__created_by=request.user
+    )
+    routine_id = routine_exercise.routine_id
+    routine_exercise.delete()
+    return redirect("routine-detail", routine_id=routine_id)
 
 @login_required
 def attendance_register(request):

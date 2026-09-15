@@ -180,3 +180,21 @@ button:hover, .btn-primary:hover { background: var(--accent-hover); color: white
 .form-submit {
     margin-top: 2rem;
 }
+
+.btn-remove {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--danger-text);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    padding: 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-remove:hover {
+    background: var(--danger-bg);
+    border-color: var(--danger-text);
+}
