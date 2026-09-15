@@ -232,6 +232,8 @@ def routine_detail(request, routine_id):
         if "exercise" in request.POST and exercise_form.is_valid():
             re = exercise_form.save(commit=False)
             re.routine = routine
+            last = routine.routine_exercises.order_by("-order").first()
+            re.order = (last.order if last else 0) + 1
             re.save()
             return redirect("routine-detail", routine_id=routine.id)
 
@@ -262,6 +264,30 @@ def remove_routine_exercise(request, re_id):
     routine_id = routine_exercise.routine_id
     routine_exercise.delete()
     return redirect("routine-detail", routine_id=routine_id)
+
+@login_required
+def move_routine_exercise(request, re_id, direction):
+    if request.method != "POST":
+        return redirect("coach-dashboard")
+
+    routine_exercise = get_object_or_404(
+        RoutineExercise, id=re_id, routine__created_by=request.user
+    )
+    siblings = list(routine_exercise.routine.routine_exercises.order_by("order"))
+    index = siblings.index(routine_exercise)
+
+    other = None
+    if direction == "up" and index > 0:
+        other = siblings[index - 1]
+    elif direction == "down" and index < len(siblings) - 1:
+        other = siblings[index + 1]
+
+    if other:
+        routine_exercise.order, other.order = other.order, routine_exercise.order
+        routine_exercise.save()
+        other.save()
+
+    return redirect("routine-detail", routine_id=routine_exercise.routine_id)
 
 @login_required
 def attendance_register(request):

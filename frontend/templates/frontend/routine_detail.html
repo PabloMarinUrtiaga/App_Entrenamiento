@@ -17,6 +17,14 @@
         {% csrf_token %}
         <button type="submit" class="btn-remove" title="Eliminar de la rutina">×</button>
     </form>
+    <form method="post" action="{% url 'move-routine-exercise' re.id 'up' %}" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" class="btn-arrow">↑</button>
+    </form>
+    <form method="post" action="{% url 'move-routine-exercise' re.id 'down' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn-arrow">↓</button>
+    </form>
     </li>
     {% empty %}
     <li>Todavía no agregaste ejercicios.</li>

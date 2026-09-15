@@ -11,7 +11,7 @@ class RoutineForm(forms.ModelForm):
 class RoutineExerciseForm(forms.ModelForm):
     class Meta:
         model = RoutineExercise
-        fields = ["exercise", "order", "sets", "reps", "notes"]
+        fields = ["exercise", "sets", "reps", "notes"]
 
 
 class RoutineAssignmentForm(forms.ModelForm):
