@@ -17,6 +17,8 @@ from teams.forms import AthleteProfileForm
 from datetime import timedelta
 import json
 
+from collections import Counter
+
 
 
 # Create your views here.
@@ -142,6 +144,12 @@ def athlete_detail(request, athlete_id):
         results_by_exercise[key]["dates"].append(r.date.strftime("%d/%m"))
         results_by_exercise[key]["weights"].append(float(r.weight_kg) if r.weight_kg is not None else None)
 
+    weekday_names = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    attendance_counts = Counter(
+        a.date.weekday() for a in Attendance.objects.filter(athlete_id=athlete_id)
+    )
+    attendance_by_weekday = [attendance_counts.get(i, 0) for i in range(7)]
+
     context = {
         "profile": profile,
         "results": all_results.order_by("-date")[:20],
@@ -149,6 +157,8 @@ def athlete_detail(request, athlete_id):
         "notes": CoachNote.objects.filter(athlete_id=athlete_id).order_by("-created_at")[:10],
         "attendances": Attendance.objects.filter(athlete_id=athlete_id).order_by("-date")[:10],
         "assignments": RoutineAssignment.objects.filter(athlete_id=athlete_id).select_related("routine"),
+        "attendance_by_weekday_json": json.dumps(attendance_by_weekday),
+        "weekday_labels_json": json.dumps(weekday_names),
     }
     return render(request, "frontend/athlete_detail.html", context)
 
