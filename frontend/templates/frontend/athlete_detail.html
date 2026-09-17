@@ -45,7 +45,6 @@ const resultsByExercise = {{ results_by_exercise_json|safe }};
 const select = document.getElementById('exerciseSelect');
 let chart = null;
 
-// Llenar el selector con los nombres de ejercicio
 for (const [id, data] of Object.entries(resultsByExercise)) {
     const option = document.createElement('option');
     option.value = id;
@@ -63,18 +62,50 @@ function renderChart(exerciseId) {
             datasets: [{ label: "Peso (kg)", data: data.weights }],
         },
     });
+    updateProgressMessage(exerciseId);
+}
+
+function updateProgressMessage(exerciseId) {
+    const data = resultsByExercise[exerciseId];
+    const msg = document.getElementById('progressMessage');
+    msg.textContent = '';
+
+    // Agrupar los pesos por semana (lunes a domingo) según la fecha de cada resultado
+    const weekAverages = {};
+    data.iso_dates.forEach((isoDate, i) => {
+        const weight = data.weights[i];
+        if (weight === null) return;
+        const d = new Date(isoDate);
+        const day = (d.getDay() + 6) % 7; // 0 = lunes
+        d.setDate(d.getDate() - day);
+        d.setHours(0, 0, 0, 0);
+        const key = d.getTime();
+        if (!weekAverages[key]) weekAverages[key] = { sum: 0, count: 0 };
+        weekAverages[key].sum += weight;
+        weekAverages[key].count += 1;
+    });
+
+    const weekKeys = Object.keys(weekAverages).map(Number).sort((a, b) => a - b);
+    if (weekKeys.length < 2) return; // no hay semana anterior para comparar
+
+    const lastWeek = weekAverages[weekKeys[weekKeys.length - 1]];
+    const prevWeek = weekAverages[weekKeys[weekKeys.length - 2]];
+    const lastAvg = lastWeek.sum / lastWeek.count;
+    const prevAvg = prevWeek.sum / prevWeek.count;
+
+    const change = ((lastAvg - prevAvg) / prevAvg) * 100;
+    const direction = change >= 0 ? "Subiste" : "Bajaste";
+    msg.textContent = `${direction} un ${Math.abs(change).toFixed(1)}% el peso respecto a la semana pasada.`;
 }
 
 select.addEventListener('change', () => renderChart(select.value));
 
-// Mostrar el primer ejercicio por default, si hay alguno
 const firstId = Object.keys(resultsByExercise)[0];
 if (firstId) {
     select.value = firstId;
     renderChart(firstId);
 }
 
-// Gráfico de asistencia por día de la semana
 new Chart(document.getElementById('attendanceChart'), {
     type: 'bar',
     data: {
