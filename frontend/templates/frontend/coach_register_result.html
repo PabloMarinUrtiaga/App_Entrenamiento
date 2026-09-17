@@ -1,0 +1,23 @@
+{% extends "frontend/base.html" %}
+{% block title %}Registrar resultado{% endblock %}
+{% block content %}
+<a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
+
+<h1>Registrar resultado de un Deportista</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+
+<h2>Últimos registrados</h2>
+<ul>
+    {% for r in recent %}
+    <li>{{ r.date|date:"d/m" }} — {{ r.athlete.get_full_name|default:r.athlete.username }} — {{ r.exercise.name }}
+        {% if r.weight_kg %}({{ r.weight_kg }} kg){% endif %}</li>
+    {% empty %}
+    <li>Todavía no registraste nada.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

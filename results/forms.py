@@ -11,3 +11,8 @@ class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
         fields = ["exercise", "reps", "weight_kg", "duration_seconds", "distance_m"]
+
+class CoachResultForm(forms.ModelForm):
+    class Meta:
+        model = Result
+        fields = ["athlete", "exercise", "reps", "weight_kg", "duration_seconds", "distance_m"]

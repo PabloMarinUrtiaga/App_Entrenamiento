@@ -11,7 +11,7 @@ from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
 from django.utils import timezone
-from results.forms import CoachNoteForm, ResultForm
+from results.forms import CoachNoteForm, ResultForm, CoachResultForm
 from accounts.forms import UserProfileForm
 from teams.forms import AthleteProfileForm
 from datetime import timedelta
@@ -347,7 +347,7 @@ def add_note(request):
         form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
 
     notes = CoachNote.objects.filter(coach=request.user).select_related("athlete").order_by("-created_at")[:20]
-    return render(request, "frontend/add_note.html", {"form": form, "notes": notes})
+    return render(request, "frontend/add_note.html", {"form": form, "notes": notes})    
 
 @login_required
 def register_result(request):
@@ -364,6 +364,25 @@ def register_result(request):
     recent = Result.objects.filter(athlete=request.user).select_related("exercise").order_by("-date")[:10]
     return render(request, "frontend/register_result.html", {"form": form, "recent": recent})
 
+@login_required
+def coach_register_result(request):
+    if request.user.role != "coach":
+        return redirect("athlete-dashboard")
+
+    if request.method == "POST":
+        form = CoachResultForm(request.POST)
+        form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
+        form.fields["exercise"].queryset = Exercise.objects.filter(created_by=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("coach-register-result")
+    else:
+        form = CoachResultForm()
+        form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
+        form.fields["exercise"].queryset = Exercise.objects.filter(created_by=request.user)
+
+    recent = Result.objects.filter(athlete__athlete_profile__coach=request.user).select_related("athlete", "exercise").order_by("-date")[:10]
+    return render(request, "frontend/coach_register_result.html", {"form": form, "recent": recent})
 
 @login_required
 def my_results(request):
