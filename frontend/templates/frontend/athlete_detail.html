@@ -12,38 +12,45 @@
     · Altura: {{ profile.height_cm|default:"—" }} cm
 </p>
 
-<h2>Rutina(s) asignada(s)</h2>
-<ul>
-    {% for a in assignments %}<li>{{ a.routine.name }}</li>
-    {% empty %}<li>Sin rutina asignada.</li>{% endfor %}
-</ul>
+<h2>Resultados por ejercicio</h2>
+<label for="exerciseSelect">Ejercicio:</label>
+<select id="exerciseSelect"></select>
 
-<h2>Últimos resultados</h2>
 <canvas id="resultsChart" height="100"></canvas>
-
-<h2>Asistencia reciente</h2>
-<ul>
-    {% for a in attendances %}<li>{{ a.date }}</li>
-    {% empty %}<li>Sin registros de asistencia.</li>{% endfor %}
-</ul>
-
-<h2>Notas</h2>
-<ul>
-    {% for n in notes %}<li>{{ n.created_at|date:"d/m/Y" }} — {{ n.text }}</li>
-    {% empty %}<li>Sin notas.</li>{% endfor %}
-</ul>
+<p id="progressMessage"></p>
 
 <script>
-const resultsData = {
-    labels: [{% for r in results %}"{{ r.date|date:'d/m' }}",{% endfor %}],
-    datasets: [{
-        label: "Peso (kg)",
-        data: [{% for r in results %}{{ r.weight_kg|default:"null" }},{% endfor %}],
-    }]
-};
-new Chart(document.getElementById('resultsChart'), {
-    type: 'line',
-    data: resultsData,
-});
+const resultsByExercise = {{ results_by_exercise_json|safe }};
+const select = document.getElementById('exerciseSelect');
+let chart = null;
+
+// Llenar el selector con los nombres de ejercicio
+for (const [id, data] of Object.entries(resultsByExercise)) {
+    const option = document.createElement('option');
+    option.value = id;
+    option.textContent = data.name;
+    select.appendChild(option);
+}
+
+function renderChart(exerciseId) {
+    const data = resultsByExercise[exerciseId];
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('resultsChart'), {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [{ label: "Peso (kg)", data: data.weights }],
+        },
+    });
+}
+
+select.addEventListener('change', () => renderChart(select.value));
+
+// Mostrar el primer ejercicio por default, si hay alguno
+const firstId = Object.keys(resultsByExercise)[0];
+if (firstId) {
+    select.value = firstId;
+    renderChart(firstId);
+}
 </script>
 {% endblock %}

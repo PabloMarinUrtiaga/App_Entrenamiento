@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count,Avg
 
 from accounts.models import User
 from teams.models import AthleteProfile, CoachInvitation, AthleteGroup
@@ -14,6 +14,8 @@ from django.utils import timezone
 from results.forms import CoachNoteForm, ResultForm
 from accounts.forms import UserProfileForm
 from teams.forms import AthleteProfileForm
+from datetime import timedelta
+import json
 
 
 
@@ -127,12 +129,23 @@ def athlete_detail(request, athlete_id):
     if request.user.role != "coach":
         return redirect("athlete-dashboard")
 
-    # get_object_or_404 con coach=request.user: si el deportista no es SUYO, devuelve 404, no 403
     profile = get_object_or_404(AthleteProfile, user_id=athlete_id, coach=request.user)
+
+    all_results = Result.objects.filter(athlete_id=athlete_id).select_related("exercise").order_by("date")
+
+    # Agrupar resultados por ejercicio para el selector del gráfico
+    results_by_exercise = {}
+    for r in all_results:
+        key = str(r.exercise_id)
+        if key not in results_by_exercise:
+            results_by_exercise[key] = {"name": r.exercise.name, "dates": [], "weights": []}
+        results_by_exercise[key]["dates"].append(r.date.strftime("%d/%m"))
+        results_by_exercise[key]["weights"].append(float(r.weight_kg) if r.weight_kg is not None else None)
 
     context = {
         "profile": profile,
-        "results": Result.objects.filter(athlete_id=athlete_id).select_related("exercise")[:20],
+        "results": all_results.order_by("-date")[:20],
+        "results_by_exercise_json": json.dumps(results_by_exercise),
         "notes": CoachNote.objects.filter(athlete_id=athlete_id).order_by("-created_at")[:10],
         "attendances": Attendance.objects.filter(athlete_id=athlete_id).order_by("-date")[:10],
         "assignments": RoutineAssignment.objects.filter(athlete_id=athlete_id).select_related("routine"),
