@@ -140,10 +140,11 @@ def athlete_detail(request, athlete_id):
     for r in all_results:
         key = str(r.exercise_id)
         if key not in results_by_exercise:
-            results_by_exercise[key] = {"name": r.exercise.name, "dates": [], "iso_dates": [], "weights": []}
+            results_by_exercise[key] = {"name": r.exercise.name, "dates": [], "iso_dates": [], "weights": [], "reps": []}
         results_by_exercise[key]["dates"].append(r.date.strftime("%d/%m"))
         results_by_exercise[key]["iso_dates"].append(r.date.isoformat())
         results_by_exercise[key]["weights"].append(float(r.weight_kg) if r.weight_kg is not None else None)
+        results_by_exercise[key]["reps"].append(r.reps)
 
     weekday_names = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
     attendance_counts = Counter(

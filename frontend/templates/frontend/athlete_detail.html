@@ -68,7 +68,16 @@ function renderChart(exerciseId) {
 function updateProgressMessage(exerciseId) {
     const data = resultsByExercise[exerciseId];
     const msg = document.getElementById('progressMessage');
-    msg.textContent = '';
+    msg.innerHTML = '';
+
+    // RM estimado (fórmula de Epley) usando el último resultado cargado
+    const lastIndex = data.weights.length - 1;
+    if (lastIndex >= 0 && data.weights[lastIndex] !== null && data.reps && data.reps[lastIndex]) {
+        const w = data.weights[lastIndex];
+        const r = data.reps[lastIndex];
+        const rm = w * (1 + r / 30);
+        msg.innerHTML += `<strong>RM estimado:</strong> ${rm.toFixed(1)} kg (según ${w}kg x ${r} reps)<br>`;
+    }
 
     // Agrupar los pesos por semana (lunes a domingo) según la fecha de cada resultado
     const weekAverages = {};
@@ -76,7 +85,7 @@ function updateProgressMessage(exerciseId) {
         const weight = data.weights[i];
         if (weight === null) return;
         const d = new Date(isoDate);
-        const day = (d.getDay() + 6) % 7; // 0 = lunes
+        const day = (d.getDay() + 6) % 7;
         d.setDate(d.getDate() - day);
         d.setHours(0, 0, 0, 0);
         const key = d.getTime();
@@ -86,7 +95,7 @@ function updateProgressMessage(exerciseId) {
     });
 
     const weekKeys = Object.keys(weekAverages).map(Number).sort((a, b) => a - b);
-    if (weekKeys.length < 2) return; // no hay semana anterior para comparar
+    if (weekKeys.length < 2) return;
 
     const lastWeek = weekAverages[weekKeys[weekKeys.length - 1]];
     const prevWeek = weekAverages[weekKeys[weekKeys.length - 2]];
@@ -95,7 +104,7 @@ function updateProgressMessage(exerciseId) {
 
     const change = ((lastAvg - prevAvg) / prevAvg) * 100;
     const direction = change >= 0 ? "Subiste" : "Bajaste";
-    msg.textContent = `${direction} un ${Math.abs(change).toFixed(1)}% el peso respecto a la semana pasada.`;
+    msg.innerHTML += `${direction} un ${Math.abs(change).toFixed(1)}% el peso respecto a la semana pasada.`;
 }
 
 select.addEventListener('change', () => renderChart(select.value));
