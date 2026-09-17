@@ -10,6 +10,7 @@ from results.models import Result, CoachNote
 from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
+from exercises.catalog import load_catalog
 from django.utils import timezone
 from results.forms import CoachNoteForm, ResultForm, CoachResultForm
 from accounts.forms import UserProfileForm
@@ -17,7 +18,7 @@ from teams.forms import AthleteProfileForm
 from datetime import timedelta
 import json
 
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 
@@ -126,6 +127,36 @@ def leave_group(request, group_id):
 
     return render(request, "frontend/leave_group_confirm.html", {"group": group})
 
+def compute_muscle_progress(athlete_id):
+    slug_to_muscle = {item["slug"]: item["muscle"] for item in load_catalog() if item["muscle"]}
+
+    results = Result.objects.filter(
+        athlete_id=athlete_id, exercise__catalog_slug__gt=""
+    ).select_related("exercise").order_by("date")
+
+    muscle_weeks = defaultdict(lambda: defaultdict(list))
+    for r in results:
+        if r.weight_kg is None:
+            continue
+        muscle = slug_to_muscle.get(r.exercise.catalog_slug)
+        if not muscle:
+            continue
+        week_start = r.date - timedelta(days=r.date.weekday())
+        muscle_weeks[muscle][week_start].append(float(r.weight_kg))
+
+    progress = {}
+    for muscle, weeks in muscle_weeks.items():
+        week_keys = sorted(weeks.keys())
+        if len(week_keys) < 2:
+            continue
+        last_avg = sum(weeks[week_keys[-1]]) / len(weeks[week_keys[-1]])
+        prev_avg = sum(weeks[week_keys[-2]]) / len(weeks[week_keys[-2]])
+        if prev_avg == 0:
+            continue
+        progress[muscle] = round(((last_avg - prev_avg) / prev_avg) * 100, 1)
+
+    return progress
+
 @login_required
 def athlete_detail(request, athlete_id):
     if request.user.role != "coach":
@@ -161,6 +192,7 @@ def athlete_detail(request, athlete_id):
         "assignments": RoutineAssignment.objects.filter(athlete_id=athlete_id).select_related("routine"),
         "attendance_by_weekday_json": json.dumps(attendance_by_weekday),
         "weekday_labels_json": json.dumps(weekday_names),
+        "muscle_progress": compute_muscle_progress(athlete_id),
     }
     return render(request, "frontend/athlete_detail.html", context)
 

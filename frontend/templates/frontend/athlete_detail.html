@@ -40,6 +40,15 @@
     {% empty %}<li>Sin notas.</li>{% endfor %}
 </ul>
 
+<h2>Progreso por grupo muscular</h2>
+<ul>
+    {% for muscle, change in muscle_progress.items %}
+    <li>{{ muscle }}: {% if change >= 0 %}+{% endif %}{{ change }}%</li>
+    {% empty %}
+    <li>Todavía no hay suficientes datos (necesitás resultados de al menos 2 semanas distintas en ejercicios con ilustración del catálogo).</li>
+    {% endfor %}
+</ul>
+
 <script>
 const resultsByExercise = {{ results_by_exercise_json|safe }};
 const select = document.getElementById('exerciseSelect');

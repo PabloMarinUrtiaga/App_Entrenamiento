@@ -7,13 +7,12 @@ _cache = None
 
 
 def load_catalog():
-    # Lee el catálogo de workout-guide una sola vez y lo cachea en memoria
     global _cache
     if _cache is None:
         with open(_CATALOG_PATH, encoding="utf-8") as f:
             data = json.load(f)
         _cache = sorted(
-            [{"slug": item["slug"], "name": item["name"]} for item in data],
+            [{"slug": item["slug"], "name": item["name"], "muscle": item.get("primaryMuscle", "")} for item in data],
             key=lambda item: item["name"],
         )
     return _cache
