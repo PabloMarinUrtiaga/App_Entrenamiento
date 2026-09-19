@@ -1,0 +1,25 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Sin conexión{% endblock %}
+{% block content %}
+<h1>Sin conexión</h1>
+<p>No hay internet en este momento. Esto es lo último que se guardó de tu rutina:</p>
+<div id="offlineRoutine">Cargando...</div>
+
+<script src="{% static 'frontend/offline-storage.js' %}"></script>
+<script>
+loadOfflineData("myRoutine", (routine) => {
+    const container = document.getElementById("offlineRoutine");
+    if (!routine) {
+        container.textContent = "Todavía no hay ninguna rutina guardada para ver sin conexión.";
+        return;
+    }
+    let html = `<h2>${routine.name}</h2><ul>`;
+    routine.exercises.forEach((ex) => {
+        html += `<li>${ex.order}. ${ex.name} — ${ex.sets ?? "—"}x${ex.reps ?? "—"} ${ex.notes ?? ""}</li>`;
+    });
+    html += "</ul>";
+    container.innerHTML = html;
+});
+</script>
+{% endblock %}

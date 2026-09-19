@@ -1,8 +1,10 @@
-const CACHE_NAME = "app-entrenamiento-v1";
+const CACHE_NAME = "app-entrenamiento-v2";
 const STATIC_ASSETS = [
     "/static/frontend/style.css",
     "/static/frontend/icon-192.png",
     "/static/frontend/icon-512.png",
+    "/static/frontend/offline-storage.js",
+    "/offline/",
 ];
 
 self.addEventListener("install", (event) => {
@@ -22,7 +24,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // Estáticos: cache primero, red como respaldo
     if (url.pathname.startsWith("/static/")) {
         event.respondWith(
             caches.match(event.request).then((cached) => cached || fetch(event.request))
@@ -30,7 +31,15 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // Páginas dinámicas: red primero, cache como respaldo si no hay conexión
+    if (event.request.mode === "navigate") {
+        event.respondWith(
+            fetch(event.request).catch(() =>
+                caches.match(event.request).then((cached) => cached || caches.match("/offline/"))
+            )
+        );
+        return;
+    }
+
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))
     );

@@ -7,7 +7,7 @@ from .views import (landing, coach_dashboard, athlete_dashboard,
                     invite_athlete,respond_invitation, group_list, group_detail,
                     my_groups, leave_group, my_routine_detail, exercise_create, exercise_list,
                     exercise_edit, remove_routine_exercise, move_routine_exercise, coach_register_result,
-                    service_worker
+                    service_worker, offline_view
                     
                     )
 
@@ -42,4 +42,5 @@ urlpatterns = [
     path("coach/routine-exercises/<int:re_id>/move/<str:direction>/", move_routine_exercise, name="move-routine-exercise"),
     path("coach/results/register/", coach_register_result, name="coach-register-result"),
     path("sw.js", service_worker, name="service-worker"),
-]
+    path("offline/", offline_view, name="offline"),
+    ]

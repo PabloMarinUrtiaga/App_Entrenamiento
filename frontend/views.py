@@ -40,6 +40,9 @@ def service_worker(request):
     response["Service-Worker-Allowed"] = "/"
     return response
 
+def offline_view(request):
+    return render(request, "frontend/offline.html")
+
 @login_required
 def coach_dashboard(request):
     if request.user.role != "coach":
@@ -111,10 +114,21 @@ def my_routine_detail(request, routine_id):
         routine_id=routine_id, athlete=request.user
     )
     routine_exercises = assignment.routine.routine_exercises.select_related("exercise")
+    
+    routine_data = {
+            "name": assignment.routine.name,
+            "exercises": [
+                {"order": re.order, "name": re.exercise.name, "sets": re.sets, "reps": re.reps, "notes": re.notes}
+                for re in routine_exercises
+            ],
+        }
+    
     return render(request, "frontend/my_routine_detail.html", {
         "routine": assignment.routine,
         "routine_exercises": routine_exercises,
+        "routine_data_json": json.dumps(routine_data),
     })
+    
 
 @login_required
 def my_groups(request):

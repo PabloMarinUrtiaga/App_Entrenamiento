@@ -18,4 +18,10 @@
     <li>Esta rutina todavía no tiene ejercicios cargados.</li>
     {% endfor %}
 </ul>
+
+<script src="{% static 'frontend/offline-storage.js' %}"></script>
+<script>
+saveOfflineData("myRoutine", {{ routine_data_json|safe }});
+</script>
+
 {% endblock %}
