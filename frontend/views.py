@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count,Avg, Max
 from django.utils import timezone
+from django.http import FileResponse
+from django.conf import settings
 
 from accounts.models import User
 from teams.models import AthleteProfile, CoachInvitation, AthleteGroup
@@ -16,7 +18,7 @@ from results.forms import CoachNoteForm, ResultForm, CoachResultForm
 from accounts.forms import UserProfileForm
 from teams.forms import AthleteProfileForm
 from datetime import timedelta
-import json
+import json, os
 
 from collections import Counter, defaultdict
 
@@ -31,6 +33,12 @@ def landing(request):
             return redirect("coach-dashboard")
         return redirect("athlete-dashboard")
     return render(request, "frontend/landing.html")
+
+def service_worker(request):
+    path = os.path.join(settings.BASE_DIR, "frontend", "static", "frontend", "sw.js")
+    response = FileResponse(open(path, "rb"), content_type="application/javascript")
+    response["Service-Worker-Allowed"] = "/"
+    return response
 
 @login_required
 def coach_dashboard(request):

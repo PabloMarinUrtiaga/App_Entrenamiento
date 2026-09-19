@@ -30,5 +30,12 @@
     <a href="{% url 'my-profile' %}">Perfil</a>
 </nav>
 {% endif %}
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+}
+</script>
+
 </body>
 </html>
