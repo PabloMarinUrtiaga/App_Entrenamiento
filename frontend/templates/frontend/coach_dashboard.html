@@ -6,6 +6,7 @@
 <ul>
     {% for athlete in athletes %}
     <li>
+        {% if athlete.last_result_date %}(última carga: {{ athlete.last_result_date|date:"d/m" }}){% else %}(sin resultados aún){% endif %}
         {{ athlete.user.get_full_name|default:athlete.user.username }}
         — {{ athlete.get_position_display|default:"sin posición" }}
         <a href="{% url 'athlete-detail' athlete.user.id %}">Ver detalle</a>

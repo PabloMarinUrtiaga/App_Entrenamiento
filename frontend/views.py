@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count,Avg
+from django.db.models import Count,Avg, Max
+from django.utils import timezone
 
 from accounts.models import User
 from teams.models import AthleteProfile, CoachInvitation, AthleteGroup
@@ -11,7 +12,6 @@ from attendance.models import Attendance
 from exercises.forms import ExerciseForm
 from exercises.models import Exercise
 from exercises.catalog import load_catalog
-from django.utils import timezone
 from results.forms import CoachNoteForm, ResultForm, CoachResultForm
 from accounts.forms import UserProfileForm
 from teams.forms import AthleteProfileForm
@@ -37,7 +37,8 @@ def coach_dashboard(request):
     if request.user.role != "coach":
         return redirect("athlete-dashboard")
 
-    athletes = AthleteProfile.objects.filter(coach=request.user).select_related("user")
+    athletes = AthleteProfile.objects.filter(coach=request.user).annotate(
+    last_result_date=Max("user__results__date"))
     return render(request, "frontend/coach_dashboard.html", {"athletes": athletes})
 
 @login_required
@@ -182,6 +183,8 @@ def athlete_detail(request, athlete_id):
         a.date.weekday() for a in Attendance.objects.filter(athlete_id=athlete_id)
     )
     attendance_by_weekday = [attendance_counts.get(i, 0) for i in range(7)]
+    last_result = Result.objects.filter(athlete_id=athlete_id).order_by("-date").first()
+    inactive_days = (timezone.now().date() - last_result.date).days if last_result else None
 
     context = {
         "profile": profile,
@@ -193,6 +196,7 @@ def athlete_detail(request, athlete_id):
         "attendance_by_weekday_json": json.dumps(attendance_by_weekday),
         "weekday_labels_json": json.dumps(weekday_names),
         "muscle_progress": compute_muscle_progress(athlete_id),
+        "inactive_days": inactive_days,
     }
     return render(request, "frontend/athlete_detail.html", context)
 

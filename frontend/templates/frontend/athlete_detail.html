@@ -12,6 +12,12 @@
     · Altura: {{ profile.height_cm|default:"—" }} cm
 </p>
 
+{% if inactive_days is None %}
+<div class="banner">Este Deportista todavía no cargó ningún resultado.</div>
+{% elif inactive_days > 14 %}
+<div class="banner">Sin actividad hace {{ inactive_days }} días.</div>
+{% endif %}
+
 <h2>Rutina(s) asignada(s)</h2>
 <ul>
     {% for a in assignments %}<li>{{ a.routine.name }}</li>
