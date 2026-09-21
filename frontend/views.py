@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count,Avg, Max
 from django.utils import timezone
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.conf import settings
 
 from accounts.models import User
@@ -410,13 +410,20 @@ def add_note(request):
 
 @login_required
 def register_result(request):
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
     if request.method == "POST":
         form = ResultForm(request.POST)
         if form.is_valid():
             result = form.save(commit=False)
             result.athlete = request.user
             result.save()
+            if is_ajax:
+                return JsonResponse({"success": True})
             return redirect("register-result")
+
+        if is_ajax:
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
     else:
         form = ResultForm()
 
