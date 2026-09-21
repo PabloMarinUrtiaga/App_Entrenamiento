@@ -1,11 +1,13 @@
 {% extends "frontend/base.html" %}
+{% load static %}
 {% block title %}Registrar resultado{% endblock %}
 {% block content %}
 <a href="{% url 'coach-dashboard' %}">&larr; Volver</a>
 
 <h1>Registrar resultado de un Deportista</h1>
+<p id="offlineMsg"></p>
 
-<form method="post">
+<form method="post" id="resultForm">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Guardar</button>
@@ -20,4 +22,36 @@
     <li>Todavía no registraste nada.</li>
     {% endfor %}
 </ul>
+
+<script src="{% static 'frontend/offline-storage.js' %}"></script>
+<script>
+document.getElementById('resultForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const msg = document.getElementById('offlineMsg');
+    msg.textContent = '';
+
+    fetch(window.location.pathname, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+    .then(async (res) => {
+        if (res.ok) {
+            window.location.reload();
+            return;
+        }
+        const data = await res.json();
+        const firstError = Object.values(data.errors)[0][0];
+        msg.textContent = 'Error: ' + firstError;
+    })
+    .catch(() => {
+        queueOfflineResult(window.location.pathname, Object.fromEntries(formData.entries()));
+        msg.textContent = 'Sin conexión: el resultado se guardó en el celular y se va a enviar solo cuando vuelva internet.';
+        form.reset();
+    });
+});
+</script>
 {% endblock %}

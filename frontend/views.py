@@ -435,13 +435,20 @@ def coach_register_result(request):
     if request.user.role != "coach":
         return redirect("athlete-dashboard")
 
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
     if request.method == "POST":
         form = CoachResultForm(request.POST)
         form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
         form.fields["exercise"].queryset = Exercise.objects.filter(created_by=request.user)
         if form.is_valid():
             form.save()
+            if is_ajax:
+                return JsonResponse({"success": True})
             return redirect("coach-register-result")
+
+        if is_ajax:
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)
     else:
         form = CoachResultForm()
         form.fields["athlete"].queryset = User.objects.filter(athlete_profile__coach=request.user)
